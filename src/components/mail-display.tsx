@@ -1,12 +1,8 @@
 import * as React from "react";
-import addDays from "date-fns/addDays";
-import addHours from "date-fns/addHours";
-import format from "date-fns/format";
-import nextSaturday from "date-fns/nextSaturday";
+import {format} from "date-fns/format";
 import {
   Archive,
   ArchiveX,
-  Clock,
   Forward,
   MailPlus,
   MoreVertical,
@@ -25,17 +21,11 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -61,7 +51,7 @@ export function MailDisplay({ mail }: MailDisplayProps) {
     body: "",
   });
 
-  const handleComposeChange = (e) => {
+  const handleComposeChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
     setComposeMail((prev) => ({
       ...prev,
@@ -69,7 +59,7 @@ export function MailDisplay({ mail }: MailDisplayProps) {
     }));
   };
 
-  const handleComposeSubmit = (e) => {
+  const handleComposeSubmit = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     // Handle sending the composed mail (API call or internal logic)
     console.log("Composed mail:", composeMail);
@@ -218,7 +208,7 @@ export function MailDisplay({ mail }: MailDisplayProps) {
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="primary">
+              <Button type="submit" variant="default">
                 Send
               </Button>
             </div>
@@ -242,13 +232,13 @@ export function MailDisplay({ mail }: MailDisplayProps) {
                 <div className="font-semibold">{mail.from}</div>
                 <div className="line-clamp-1 text-xs">{mail.subject}</div>
                 <div className="line-clamp-1 text-xs">
-                  <span className="font-medium">Reply-To:</span> {mail.email}
+                  <span className="font-medium">Reply-To:</span> {mail.from}
                 </div>
               </div>
             </div>
-            {mail.date && (
+            {mail.createdAt && (
               <div className="ml-auto text-xs text-muted-foreground">
-                {format(new Date(mail.date), "PPpp")}
+                {format(new Date(mail.createdAt), "PPpp")}
               </div>
             )}
           </div>

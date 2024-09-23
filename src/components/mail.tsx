@@ -35,7 +35,7 @@ import { AccountSwitcher } from "@/components/account-switcher";
 import { MailDisplay } from "@/components/mail-display";
 import { MailList } from "@/components/mail-list";
 import { Nav } from "@/components/nav";
-// import { type Mail } from "../app/data";
+import { type Mail } from "../app/data";
 // import { useMail } from "../app/use-mail";
 
 interface MailProps {
@@ -44,7 +44,7 @@ interface MailProps {
     email: string;
     icon: React.ReactNode;
   }[];
-  mails: any[];
+  mails: Mail[];
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
@@ -59,20 +59,21 @@ export function Mail({
 }: MailProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [selectedMail, setSelectedMail] = React.useState<Mail | null>(null);  // Update state to hold selected mail
-  const [selectedFolder, setSelectedFolder] = React.useState("Inbox"); // State for selected folder
-  const [selectedCategory, setSelectedCategory] = React.useState(null); // State for selected category
+  const [selectedFolder, setSelectedFolder] = React.useState<string | null>("Inbox");
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null); // State for selected category
 
   // Function to select folder and clear category
-  const handleSelectFolder = (folder) => {
+  const handleSelectFolder = (folder: string) => {
     setSelectedFolder(folder);
     setSelectedCategory(null); // Clear category when folder is selected
-  };
+  };  
 
   // Function to select category and clear folder
-  const handleSelectCategory = (category) => {
+  const handleSelectCategory = (category: string | null) => {
     setSelectedCategory(category);
     setSelectedFolder(null); // Clear folder when category is selected
   };
+
 
   // Filter mails based on selected folder or category
   console.log("all mail items:", mails)
@@ -100,15 +101,12 @@ export function Mail({
           collapsible={true}
           minSize={15}
           maxSize={20}
-          onCollapse={(collapsed) => {
-            setIsCollapsed(collapsed);
-            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-              collapsed
-            )}`;
-          }}
-          className={cn(
-            isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
-          )}
+        // onCollapse={(collapsed: boolean, ...args: any[]) => {
+        //   if (collapsed !== undefined) {
+        //     setIsCollapsed(collapsed);
+        //     document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(collapsed)}`;
+        //   }
+        // }}                 
         >
           <div
             className={cn(
@@ -219,10 +217,10 @@ export function Mail({
               </form>
             </div>
             <TabsContent value="all" className="m-0">
-            <MailList items={filteredMails} onSelectMail={setSelectedMail} />
+              <MailList items={filteredMails} onSelectMail={setSelectedMail} />
             </TabsContent>
             <TabsContent value="unread" className="m-0">
-            <MailList items={filteredMails.filter((item) => !item.read)} onSelectMail={setSelectedMail} />
+              <MailList items={filteredMails.filter((item) => !item.read)} onSelectMail={setSelectedMail} />
             </TabsContent>
           </Tabs>
         </ResizablePanel>

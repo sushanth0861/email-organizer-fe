@@ -188,7 +188,21 @@ export const mails = [
   },
 ]
 
-export type Mail = (typeof mails)[number]
+// export type Mail = (typeof mails)[number]
+export interface Mail {
+  id: string;
+  userId: number;
+  folder: string;
+  category: string;
+  subject: string;
+  body: string;      // Updated from 'text'
+  from: string;      // Added field
+  to: string;        // Added field
+  read: boolean;
+  createdAt: string; // Added field
+  labels: string[];
+}
+
 
 export const accounts = [
   {
