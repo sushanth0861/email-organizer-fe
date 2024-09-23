@@ -18,6 +18,7 @@ interface NavProps {
     label?: string
     icon: LucideIcon
     variant: "default" | "ghost"
+    onClick?: () => void  // Add optional onClick handler to each link
   }[]
 }
 
@@ -40,6 +41,7 @@ export function Nav({ links, isCollapsed }: NavProps) {
                     link.variant === "default" &&
                       "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
                   )}
+                  onClick={link.onClick} // Attach onClick event here
                 >
                   <link.icon className="h-4 w-4" />
                   <span className="sr-only">{link.title}</span>
@@ -64,6 +66,7 @@ export function Nav({ links, isCollapsed }: NavProps) {
                   "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
                 "justify-start"
               )}
+              onClick={link.onClick} // Attach onClick event here
             >
               <link.icon className="mr-2 h-4 w-4" />
               {link.title}

@@ -1,60 +1,101 @@
-import addDays from "date-fns/addDays"
-import addHours from "date-fns/addHours"
-import format from "date-fns/format"
-import nextSaturday from "date-fns/nextSaturday"
+import * as React from "react";
+import addDays from "date-fns/addDays";
+import addHours from "date-fns/addHours";
+import format from "date-fns/format";
+import nextSaturday from "date-fns/nextSaturday";
 import {
   Archive,
   ArchiveX,
   Clock,
   Forward,
+  MailPlus,
   MoreVertical,
   Reply,
   ReplyAll,
   Trash2,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Calendar }from "@/components/ui/calendar"
+} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Separator } from  "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { Textarea }  from "@/components/ui/textarea"
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Mail } from "../app/data"
+} from "@/components/ui/tooltip";
+import { Mail } from "../app/data";
 
 interface MailDisplayProps {
-  mail: Mail | null
+  mail: Mail | null;
 }
 
 export function MailDisplay({ mail }: MailDisplayProps) {
-  const today = new Date()
+  const today = new Date();
+
+  // State to toggle the compose panel
+  const [isComposing, setIsComposing] = React.useState(false);
+  const [composeMail, setComposeMail] = React.useState({
+    to: "",
+    subject: "",
+    body: "",
+  });
+
+  const handleComposeChange = (e) => {
+    const { name, value } = e.target;
+    setComposeMail((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleComposeSubmit = (e) => {
+    e.preventDefault();
+    // Handle sending the composed mail (API call or internal logic)
+    console.log("Composed mail:", composeMail);
+    // After sending, you can reset the form and close the compose panel
+    setIsComposing(false);
+    setComposeMail({ to: "", subject: "", body: "" });
+  };
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center p-2">
         <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsComposing(true)} // Toggle compose panel
+              >
+                <MailPlus className="h-4 w-4" />
+                <span className="sr-only">Compose Mail</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Compose Mail</TooltipContent>
+          </Tooltip>
+          <Separator orientation="vertical" className="mx-1 h-6" />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" disabled={!mail}>
@@ -81,66 +122,6 @@ export function MailDisplay({ mail }: MailDisplayProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent>Move to trash</TooltipContent>
-          </Tooltip>
-          <Separator orientation="vertical" className="mx-1 h-6" />
-          <Tooltip>
-            <Popover>
-              <PopoverTrigger asChild>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" disabled={!mail}>
-                    <Clock className="h-4 w-4" />
-                    <span className="sr-only">Snooze</span>
-                  </Button>
-                </TooltipTrigger>
-              </PopoverTrigger>
-              <PopoverContent className="flex w-[535px] p-0">
-                <div className="flex flex-col gap-2 border-r px-2 py-4">
-                  <div className="px-4 text-sm font-medium">Snooze until</div>
-                  <div className="grid min-w-[250px] gap-1">
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      Later today{" "}
-                      <span className="ml-auto text-muted-foreground">
-                        {format(addHours(today, 4), "E, h:m b")}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      Tomorrow
-                      <span className="ml-auto text-muted-foreground">
-                        {format(addDays(today, 1), "E, h:m b")}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      This weekend
-                      <span className="ml-auto text-muted-foreground">
-                        {format(nextSaturday(today), "E, h:m b")}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      Next week
-                      <span className="ml-auto text-muted-foreground">
-                        {format(addDays(today, 7), "E, h:m b")}
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-                <div className="p-2">
-                  <Calendar />
-                </div>
-              </PopoverContent>
-            </Popover>
-            <TooltipContent>Snooze</TooltipContent>
           </Tooltip>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -189,21 +170,76 @@ export function MailDisplay({ mail }: MailDisplayProps) {
         </DropdownMenu>
       </div>
       <Separator />
-      {mail ? (
-        <div className="flex flex-1 flex-col">
+
+      {/* Compose Mail Panel */}
+      {isComposing ? (
+        <div className="p-4">
+          <form onSubmit={handleComposeSubmit} className="grid gap-4">
+            <div>
+              <Label htmlFor="to">To:</Label>
+              <input
+                id="to"
+                name="to"
+                type="email"
+                value={composeMail.to}
+                onChange={handleComposeChange}
+                className="mt-1 block w-full border px-3 py-2 rounded-md"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="subject">Subject:</Label>
+              <input
+                id="subject"
+                name="subject"
+                type="text"
+                value={composeMail.subject}
+                onChange={handleComposeChange}
+                className="mt-1 block w-full border px-3 py-2 rounded-md"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="body">Body:</Label>
+              <Textarea
+                id="body"
+                name="body"
+                value={composeMail.body}
+                onChange={handleComposeChange}
+                rows={6}
+                required
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsComposing(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary">
+                Send
+              </Button>
+            </div>
+          </form>
+        </div>
+      ) : mail ? (
+        // Existing mail display functionality when no compose panel is active
+        <div className="flex-1 flex-col">
           <div className="flex items-start p-4">
             <div className="flex items-start gap-4 text-sm">
               <Avatar>
-                <AvatarImage alt={mail.name} />
+                <AvatarImage alt={mail.from} />
                 <AvatarFallback>
-                  {mail.name
+                  {mail.from
                     .split(" ")
                     .map((chunk) => chunk[0])
                     .join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
-                <div className="font-semibold">{mail.name}</div>
+                <div className="font-semibold">{mail.from}</div>
                 <div className="line-clamp-1 text-xs">{mail.subject}</div>
                 <div className="line-clamp-1 text-xs">
                   <span className="font-medium">Reply-To:</span> {mail.email}
@@ -218,7 +254,7 @@ export function MailDisplay({ mail }: MailDisplayProps) {
           </div>
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-            {mail.text}
+            {mail.body}
           </div>
           <Separator className="mt-auto" />
           <div className="p-4">
@@ -226,7 +262,7 @@ export function MailDisplay({ mail }: MailDisplayProps) {
               <div className="grid gap-4">
                 <Textarea
                   className="p-4"
-                  placeholder={`Reply ${mail.name}...`}
+                  placeholder={`Reply ${mail.from}...`}
                 />
                 <div className="flex items-center">
                   <Label
@@ -254,5 +290,5 @@ export function MailDisplay({ mail }: MailDisplayProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

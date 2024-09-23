@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AlertCircle,
   Archive,
@@ -13,41 +13,41 @@ import {
   ShoppingCart,
   Trash2,
   Users2,
-} from "lucide-react"
+} from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "@/components/ui/resizable"
+} from "@/components/ui/resizable";
 
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/separator";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/ui/tabs"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import { AccountSwitcher } from "@/components/account-switcher"
-import { MailDisplay } from "@/components/mail-display"
-import { MailList } from "@/components/mail-list"
-import { Nav } from "@/components/nav"
-import { type Mail } from "../app/data"
-import { useMail } from "../app/use-mail"
+} from "@/components/ui/tabs";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AccountSwitcher } from "@/components/account-switcher";
+import { MailDisplay } from "@/components/mail-display";
+import { MailList } from "@/components/mail-list";
+import { Nav } from "@/components/nav";
+// import { type Mail } from "../app/data";
+// import { useMail } from "../app/use-mail";
 
 interface MailProps {
   accounts: {
-    label: string
-    email: string
-    icon: React.ReactNode
-  }[]
-  mails: Mail[]
-  defaultLayout: number[] | undefined
-  defaultCollapsed?: boolean
-  navCollapsedSize: number
+    label: string;
+    email: string;
+    icon: React.ReactNode;
+  }[];
+  mails: any[];
+  defaultLayout: number[] | undefined;
+  defaultCollapsed?: boolean;
+  navCollapsedSize: number;
 }
 
 export function Mail({
@@ -57,8 +57,31 @@ export function Mail({
   defaultCollapsed = false,
   navCollapsedSize,
 }: MailProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
-  const [mail] = useMail()
+  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+  const [selectedMail, setSelectedMail] = React.useState<Mail | null>(null);  // Update state to hold selected mail
+  const [selectedFolder, setSelectedFolder] = React.useState("Inbox"); // State for selected folder
+  const [selectedCategory, setSelectedCategory] = React.useState(null); // State for selected category
+
+  // Function to select folder and clear category
+  const handleSelectFolder = (folder) => {
+    setSelectedFolder(folder);
+    setSelectedCategory(null); // Clear category when folder is selected
+  };
+
+  // Function to select category and clear folder
+  const handleSelectCategory = (category) => {
+    setSelectedCategory(category);
+    setSelectedFolder(null); // Clear folder when category is selected
+  };
+
+  // Filter mails based on selected folder or category
+  console.log("all mail items:", mails)
+  const filteredMails = mails.filter((item) => {
+    if (selectedFolder) return item.folder === selectedFolder;
+    if (selectedCategory) return item.category === selectedCategory;
+    return true;
+  });
+  console.log("filteredMails items:", filteredMails)
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -67,7 +90,7 @@ export function Mail({
         onLayout={(sizes: number[]) => {
           document.cookie = `react-resizable-panels:layout=${JSON.stringify(
             sizes
-          )}`
+          )}`;
         }}
         className="h-full max-h-[800px] items-stretch"
       >
@@ -78,108 +101,99 @@ export function Mail({
           minSize={15}
           maxSize={20}
           onCollapse={(collapsed) => {
-            setIsCollapsed(collapsed)
+            setIsCollapsed(collapsed);
             document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
               collapsed
-            )}`
+            )}`;
           }}
           className={cn(
-            isCollapsed &&
-              "min-w-[50px] transition-all duration-300 ease-in-out"
+            isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
           )}
         >
           <div
             className={cn(
-              "flex h-[52px] items-center justify-center",
+              "flex h-[56px] items-center justify-center",
               isCollapsed ? "h-[52px]" : "px-2"
             )}
           >
             <AccountSwitcher isCollapsed={isCollapsed} accounts={accounts} />
           </div>
           <Separator />
+
+          {/* Folder Navigation */}
           <Nav
             isCollapsed={isCollapsed}
             links={[
               {
                 title: "Inbox",
-                label: "128",
+                // label: "128",
                 icon: Inbox,
-                variant: "default",
+                variant: selectedFolder === "Inbox" ? "default" : "ghost",
+                onClick: () => handleSelectFolder("Inbox"),
               },
               {
                 title: "Drafts",
-                label: "9",
+                // label: "9",
                 icon: File,
-                variant: "ghost",
+                variant: selectedFolder === "Drafts" ? "default" : "ghost",
+                onClick: () => handleSelectFolder("Drafts"),
               },
               {
                 title: "Sent",
-                label: "",
+                // label: "",
                 icon: Send,
-                variant: "ghost",
+                variant: selectedFolder === "Sent" ? "default" : "ghost",
+                onClick: () => handleSelectFolder("Sent"),
               },
               {
                 title: "Junk",
-                label: "23",
+                // label: "23",
                 icon: ArchiveX,
-                variant: "ghost",
+                variant: selectedFolder === "Junk" ? "default" : "ghost",
+                onClick: () => handleSelectFolder("Junk"),
               },
               {
                 title: "Trash",
-                label: "",
+                // label: "",
                 icon: Trash2,
-                variant: "ghost",
+                variant: selectedFolder === "Trash" ? "default" : "ghost",
+                onClick: () => handleSelectFolder("Trash"),
               },
               {
                 title: "Archive",
-                label: "",
+                // label: "",
                 icon: Archive,
-                variant: "ghost",
+                variant: selectedFolder === "Archive" ? "default" : "ghost",
+                onClick: () => handleSelectFolder("Archive"),
               },
             ]}
           />
+
           <Separator />
+
+          {/* Category Navigation */}
           <Nav
             isCollapsed={isCollapsed}
-            links={[
-              {
-                title: "Social",
-                label: "972",
-                icon: Users2,
-                variant: "ghost",
-              },
-              {
-                title: "Updates",
-                label: "342",
-                icon: AlertCircle,
-                variant: "ghost",
-              },
-              {
-                title: "Forums",
-                label: "128",
-                icon: MessagesSquare,
-                variant: "ghost",
-              },
-              {
-                title: "Shopping",
-                label: "8",
-                icon: ShoppingCart,
-                variant: "ghost",
-              },
-              {
-                title: "Promotions",
-                label: "21",
-                icon: Archive,
-                variant: "ghost",
-              },
-            ]}
+            links={mails
+              .map((mail) => mail.category)
+              .filter((value, index, self) => self.indexOf(value) === index) // Get unique categories
+              .map((category) => ({
+                title: category,
+                label: mails.filter((mail) => mail.category === category).length.toString(),
+                icon: Inbox, // Replace with actual icons for each category
+                variant: selectedCategory === category ? "default" : "ghost",
+                onClick: () => handleSelectCategory(category),
+              }))}
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
           <Tabs defaultValue="all">
             <div className="flex items-center px-4 py-2">
-              <h1 className="text-xl font-bold">Inbox</h1>
+              <h1 className="text-xl font-bold">
+                {selectedFolder || selectedCategory || "All Mail"}
+              </h1>
+              {/* Display selected folder or category */}
               <TabsList className="ml-auto">
                 <TabsTrigger
                   value="all"
@@ -205,20 +219,19 @@ export function Mail({
               </form>
             </div>
             <TabsContent value="all" className="m-0">
-              <MailList items={mails} />
+            <MailList items={filteredMails} onSelectMail={setSelectedMail} />
             </TabsContent>
             <TabsContent value="unread" className="m-0">
-              <MailList items={mails.filter((item) => !item.read)} />
+            <MailList items={filteredMails.filter((item) => !item.read)} onSelectMail={setSelectedMail} />
             </TabsContent>
           </Tabs>
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[2]}>
-          <MailDisplay
-            mail={mails.find((item) => item.id === mail.selected) || null}
-          />
+          {/* <MailDisplay mail={mails.find((item) => item.id === selectedMail?.id) || null} /> */}
+          <MailDisplay mail={selectedMail} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </TooltipProvider>
-  )
+  );
 }

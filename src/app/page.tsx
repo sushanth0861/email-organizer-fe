@@ -5,17 +5,38 @@ import Cookies from 'js-cookie';
 import Image from 'next/image';
 
 import { Mail } from '@/components/mail';
-import { accounts, mails } from './data';
+import "./mdx.css"
+import { accounts } from './data';
 
 export default function MailPage() {
   const [defaultLayout, setDefaultLayout] = useState(undefined);
   const [defaultCollapsed, setDefaultCollapsed] = useState(undefined);
+  const [mails, setMails] = useState([]); // State to hold the mails fetched from backend
 
   useEffect(() => {
+    // Fetch mails from backend
+    const fetchMails = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mails`);
+        const data = await response.json();
+        setMails(data);
+      } catch (error) {
+        console.error('Error fetching mails:', error);
+      }
+    };
+
+    fetchMails();
+
     const layout = Cookies.get('react-resizable-panels:layout');
     const collapsed = Cookies.get('react-resizable-panels:collapsed');
-
-    const parseJSON = (value) => {
+    
+    const parseJSON = (value: string) => {
+      if (!value) {
+        // Log and return undefined if the value is falsy (null, undefined, empty string)
+        console.warn('No valid JSON string found:', value);
+        return undefined;
+      }
+      
       try {
         return JSON.parse(value);
       } catch (e) {
@@ -23,10 +44,11 @@ export default function MailPage() {
         return undefined;
       }
     };
-
+    
+    // Safely parse the layout and collapsed cookies
     setDefaultLayout(layout ? parseJSON(layout) : undefined);
     setDefaultCollapsed(collapsed ? parseJSON(collapsed) : undefined);
-
+    
     // Add the no-scroll class to the body when the component mounts
     document.body.classList.add('no-scroll');
 
